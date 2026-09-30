@@ -1,38 +1,65 @@
-This project implements an RCNN-based object detection pipeline to identify and localize objects (airplanes in this case) in images. The workflow combines classical computer vision and deep learning techniques.
-Data Preparation:
+# ✈️ R-CNN Aircraft Detection
+An R-CNN-based object detection pipeline for identifying and localizing aircraft in images. The project combines Selective Search, VGG16 feature extraction, and region-based classification to demonstrate the fundamentals of two-stage object detection.
 
-Images of airplanes along with bounding box annotations are loaded.
+## 🔍 Pipeline
 
-Positive and negative regions are extracted using Selective Search.
+```text
+Input Image
+     ↓
+Selective Search
+     ↓
+Region Proposals
+     ↓
+VGG16 Feature Extraction
+     ↓
+Region Classification
+     ↓
+Bounding Box Regression
+     ↓
+Final Aircraft Detection
+```
+## 1. Data Preparation
 
-Feature Extraction:
+Aircraft images and their corresponding bounding-box annotations are loaded and processed to generate training samples.
 
-Each proposed region is passed through VGG16, a pretrained convolutional neural network, to generate fixed-size feature vectors.
+Selective Search is used to generate candidate object regions, which are separated into positive and negative samples based on their overlap with the ground-truth bounding boxes.
 
-Classification:
+## 2. Feature Extraction
 
-A Support Vector Machine (SVM) or a custom fully connected layer classifies regions as object or background.
+Each proposed region is resized and passed through VGG16, a pretrained convolutional neural network, to extract fixed-size visual feature representations.
 
-Bounding Box Regression (Optional):
+## 3. Region Classification
 
-Improves accuracy by fine-tuning predicted bounding box coordinates.
+The extracted features are classified as either:
 
-Visualization:
+Aircraft
+Background
 
-Detected objects are displayed with bounding boxes on images.
+Classification can be performed using an SVM or a fully connected neural-network classifier.
 
-Key Features:
+## 4. Bounding Box Regression
 
-Uses pretrained deep learning models for feature extraction.
+A bounding-box regression stage can refine the predicted coordinates of detected aircraft, improving localization accuracy.
 
-Combines computer vision techniques (Selective Search) with deep learning for object detection.
+## 5. Visualization
 
-Can be extended to real-time detection using video or webcam streams.
+The final predictions are visualized by drawing bounding boxes around detected aircraft in the input images.
 
-Drive mounting is per user:
+✨ Key Features
+Implements the fundamental R-CNN object detection pipeline
+Uses Selective Search for region proposal generation
+Uses pretrained VGG16 for feature extraction
+Explores SVM-based region classification
+Supports bounding-box regression
+Visualizes detected aircraft with bounding boxes
+Demonstrates the combination of classical computer vision and deep learning
+☁️ Google Colab
+
+The project can be run using Google Colab with Google Drive used for dataset storage.
+
+Drive mounting is performed per user:
 
 from google.colab import drive
 drive.mount('/content/drive')
 
-
-This prompts the user to authorize their own Google account.
+This prompts the user to authorize their own Google account. No personal Google Drive credentials are stored in the repository.
