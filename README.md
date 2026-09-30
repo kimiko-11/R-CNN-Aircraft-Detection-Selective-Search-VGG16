@@ -1,7 +1,16 @@
 # ✈️ R-CNN Aircraft Detection
-An R-CNN-based object detection pipeline for identifying and localizing aircraft in images. The project combines Selective Search, VGG16 feature extraction, and region-based classification to demonstrate the fundamentals of two-stage object detection.
 
-## 🔍 Pipeline
+### Region-Based Object Detection using Selective Search and VGG16
+
+An implementation of the **R-CNN (Regions with CNN features)** object detection pipeline for detecting and localizing aircraft in images.
+
+This project demonstrates how classical computer vision techniques can be combined with deep learning to build a two-stage object detection system.
+
+The pipeline uses **Selective Search** to generate candidate regions and **VGG16** to extract visual features from those regions before classifying them as aircraft or background.
+
+---
+
+## 🔍 Detection Pipeline
 
 ```text
 Input Image
@@ -10,56 +19,90 @@ Selective Search
      ↓
 Region Proposals
      ↓
+IoU-based Positive / Negative Sampling
+     ↓
+Resize Regions to 224 × 224
+     ↓
 VGG16 Feature Extraction
      ↓
 Region Classification
      ↓
-Bounding Box Regression
-     ↓
 Final Aircraft Detection
 ```
-## 1. Data Preparation
+##  How It Works
+1. Dataset Preparation
 
-Aircraft images and their corresponding bounding-box annotations are loaded and processed to generate training samples.
+The project uses an aircraft image dataset containing images and corresponding bounding-box annotations.
 
-Selective Search is used to generate candidate object regions, which are separated into positive and negative samples based on their overlap with the ground-truth bounding boxes.
+The dataset is organized into:
 
-## 2. Feature Extraction
+Images/
+└── *.jpg
 
-Each proposed region is resized and passed through VGG16, a pretrained convolutional neural network, to extract fixed-size visual feature representations.
+Airplanes_Annotations/
+└── *.csv
 
-## 3. Region Classification
+Each annotation file contains the bounding-box coordinates corresponding to the aircraft present in the associated image.
 
-The extracted features are classified as either:
+Note: The dataset itself is not included in this repository. Please download it from the original dataset source and place it in the required directory structure.
+
+2. Ground-Truth Bounding Boxes
+
+The annotation files are read and converted into bounding-box coordinates:
+
+x1, y1
+x2, y2
+
+These ground-truth boxes are later used to determine whether a Selective Search region represents an aircraft or background.
+
+3. Region Proposal Generation
+
+Instead of directly predicting bounding boxes using a neural network, this implementation uses Selective Search to generate candidate object regions.
+
+Up to approximately 2000 region proposals can be examined for each image.
+
+Each proposal is compared with the ground-truth bounding boxes using Intersection over Union (IoU).
+
+                 Ground Truth
+              ┌───────────────┐
+              │               │
+              │    ✈️         │
+              │               │
+              └───────────────┘
+                    ∩
+              ┌─────────────┐
+              │   Proposal  │
+              └─────────────┘
+
+Regions with sufficient overlap are treated as positive samples, while regions with low overlap are used as negative samples.
+
+4. Region Preprocessing
+
+The selected region proposals are cropped from the original image and resized to:
+
+224 × 224 pixels
+
+This allows them to be passed into the pretrained VGG16 network.
+
+5. VGG16 Feature Extraction
+
+Each region is passed through a pretrained VGG16 network using ImageNet weights.
+
+The convolutional network extracts visual features representing characteristics such as:
+
+Edges
+Shapes
+Textures
+Object structures
+
+The pretrained layers provide a strong visual representation without requiring the entire network to be trained from scratch.
+
+6. Region Classification
+
+The extracted features are used to determine whether a region contains:
 
 Aircraft
+   or
 Background
 
-Classification can be performed using an SVM or a fully connected neural-network classifier.
-
-## 4. Bounding Box Regression
-
-A bounding-box regression stage can refine the predicted coordinates of detected aircraft, improving localization accuracy.
-
-## 5. Visualization
-
-The final predictions are visualized by drawing bounding boxes around detected aircraft in the input images.
-
-✨ Key Features
-Implements the fundamental R-CNN object detection pipeline
-Uses Selective Search for region proposal generation
-Uses pretrained VGG16 for feature extraction
-Explores SVM-based region classification
-Supports bounding-box regression
-Visualizes detected aircraft with bounding boxes
-Demonstrates the combination of classical computer vision and deep learning
-☁️ Google Colab
-
-The project can be run using Google Colab with Google Drive used for dataset storage.
-
-Drive mounting is performed per user:
-
-from google.colab import drive
-drive.mount('/content/drive')
-
-This prompts the user to authorize their own Google account. No personal Google Drive credentials are stored in the repository.
+This transforms the collection of region proposals into candidate aircraft detections.
